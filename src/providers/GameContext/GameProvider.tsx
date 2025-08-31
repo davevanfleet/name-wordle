@@ -13,6 +13,8 @@ export const GameContextProvider = ({
 
   const [gameWon, setGameWon] = useState(false);
   const [guesses, setGuesses] = useState<Letter[][]>([]);
+  const [currentGuess, setCurrentGuess] = useState("");
+  const [animatingGuess, setAnimatingGuess] = useState<number | null>(null);
   const [usedLetters, setUsedLetters] = useState<Record<string, LetterState>>(
     {}
   );
@@ -60,29 +62,45 @@ export const GameContextProvider = ({
     }
 
     const guessResult = checkGuess(upperGuess);
+    const guessIndex = guesses.length;
+    const isWinningGuess = upperGuess === TARGET_WORD;
+    
+    // Start animation
+    setAnimatingGuess(guessIndex);
     setGuesses((prev) => [...prev, guessResult]);
+    setCurrentGuess("");
+    
 
-    const newUsedLetters = { ...usedLetters };
-    guessResult.forEach((letter) => {
-      const currentState = newUsedLetters[letter.char];
-      if (
-        !currentState ||
-        (currentState !== "correct" && letter.state === "correct") ||
-        (currentState === "not-in-word" && letter.state === "wrong-position")
-      ) {
-        newUsedLetters[letter.char] = letter.state;
+    // Update used letters and check for win after animation completes
+    setTimeout(() => {
+      const newUsedLetters = { ...usedLetters };
+      guessResult.forEach((letter) => {
+        const currentState = newUsedLetters[letter.char];
+        if (
+          !currentState ||
+          (currentState !== "correct" && letter.state === "correct") ||
+          (currentState === "not-in-word" && letter.state === "wrong-position")
+        ) {
+          newUsedLetters[letter.char] = letter.state;
+        }
+      });
+      setUsedLetters(newUsedLetters);
+
+      if (isWinningGuess) {
+        setGameWon(true);
       }
-    });
-    setUsedLetters(newUsedLetters);
 
-    if (upperGuess === TARGET_WORD) {
-      setGameWon(true);
-    }
+      setAnimatingGuess(null);
+    }, 1400); // Last letter starts at 450ms + 800ms animation + 150ms buffer
+  };
+
+  const updateCurrentGuess = (guess: string) => {
+    setCurrentGuess(guess);
   };
 
   return (
     <GameContext.Provider
-      value={{ gameWon, guesses, usedLetters, submitGuess }}
+      value={{ gameWon, guesses, currentGuess, animatingGuess, usedLetters, submitGuess, updateCurrentGuess }}
     >
       {children}
     </GameContext.Provider>

@@ -14,15 +14,21 @@ export interface Letter {
 type GameContextType = {
   gameWon: boolean;
   guesses: Letter[][];
+  currentGuess: string;
+  animatingGuess: number | null;
   usedLetters: Record<string, LetterState>;
   submitGuess: (guess: string) => void;
+  updateCurrentGuess: (guess: string) => void;
 };
 
 export const GameContext = createContext<GameContextType>({
   gameWon: false,
   guesses: [],
+  currentGuess: "",
+  animatingGuess: null,
   usedLetters: {},
   submitGuess: () => {},
+  updateCurrentGuess: () => {},
 });
 
 export const useGameContext = () => useContext(GameContext);

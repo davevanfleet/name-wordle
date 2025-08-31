@@ -31,7 +31,7 @@
   display: flex;
   flex-direction: column;
   margin-top: 80px;
-  margin-bottom: 280px;
+  margin-bottom: 200px;
   overflow: hidden;
 }
 
@@ -112,46 +112,81 @@ h1 {
   color: #333;
 }
 
-.current-guess-container {
-  position: fixed;
-  bottom: 200px;
-  left: 0;
-  right: 0;
-  background-color: white;
-  border-top: 1px solid #ddd;
-  padding: 1rem;
-  z-index: 50;
-}
-
-.current-guess-display {
-  display: flex;
-  justify-content: center;
-  margin: 0;
-}
-
-.current-guess-row {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.current-letter {
-  width: 60px;
-  height: 60px;
-  border: 2px solid #ddd;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  border-radius: 4px;
+.letter-current {
   background-color: white;
   color: #333;
-}
-
-.current-letter.filled {
   border-color: #878a8c;
 }
+
+.letter-flipping-correct {
+  animation: flip-correct 0.8s ease-in-out forwards;
+}
+
+.letter-flipping-wrong-position {
+  animation: flip-wrong-position 0.8s ease-in-out forwards;
+}
+
+.letter-flipping-not-in-word {
+  animation: flip-not-in-word 0.8s ease-in-out forwards;
+}
+
+@keyframes flip-correct {
+  0% {
+    transform: rotateX(0);
+    background-color: white;
+    border-color: #878a8c;
+  }
+  50% {
+    transform: rotateX(-90deg);
+    background-color: white;
+    border-color: #ddd;
+  }
+  100% {
+    transform: rotateX(0);
+    background-color: #6aaa64;
+    color: white;
+    border-color: #6aaa64;
+  }
+}
+
+@keyframes flip-wrong-position {
+  0% {
+    transform: rotateX(0);
+    background-color: white;
+    border-color: #878a8c;
+  }
+  50% {
+    transform: rotateX(-90deg);
+    background-color: white;
+    border-color: #ddd;
+  }
+  100% {
+    transform: rotateX(0);
+    background-color: #c9b458;
+    color: white;
+    border-color: #c9b458;
+  }
+}
+
+@keyframes flip-not-in-word {
+  0% {
+    transform: rotateX(0);
+    background-color: white;
+    border-color: #878a8c;
+  }
+  50% {
+    transform: rotateX(-90deg);
+    background-color: white;
+    border-color: #ddd;
+  }
+  100% {
+    transform: rotateX(0);
+    background-color: #787c7e;
+    color: white;
+    border-color: #787c7e;
+  }
+}
+
 
 button {
   padding: 0.75rem 1.5rem;
@@ -294,12 +329,7 @@ button:disabled {
 
   .game-content {
     margin-top: 70px;
-    margin-bottom: 240px;
-  }
-  
-  .current-guess-container {
-    bottom: 180px;
-    padding: 0.75rem;
+    margin-bottom: 180px;
   }
 
   .scrollable-content {
@@ -321,19 +351,6 @@ button:disabled {
     gap: 2vw;
   }
 
-  .current-letter {
-    width: 13vw;
-    height: 13vw;
-    max-width: 60px;
-    max-height: 60px;
-    min-width: 45px;
-    min-height: 45px;
-    font-size: 3.5vw;
-  }
-
-  .current-guess-row {
-    gap: 2vw;
-  }
 
   .keyboard-container {
     padding: 0.75rem;
@@ -357,12 +374,7 @@ button:disabled {
 
   .game-content {
     margin-top: 60px;
-    margin-bottom: 200px;
-  }
-  
-  .current-guess-container {
-    bottom: 160px;
-    padding: 0.5rem;
+    margin-bottom: 160px;
   }
 
   .scrollable-content {
@@ -387,18 +399,6 @@ button:disabled {
     border-width: 2px;
   }
 
-  .current-letter {
-    width: 16vw;
-    height: 16vw;
-    max-width: 55px;
-    max-height: 55px;
-    font-size: 4.5vw;
-    border-width: 2px;
-  }
-
-  .current-guess-row {
-    gap: 1.5vw;
-  }
 
   .keyboard-container {
     padding: 0.5rem;

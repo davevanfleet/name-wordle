@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useGameContext } from "../providers/GameContext/GameContext";
 
 const KEYBOARD_ROWS = [
@@ -8,21 +7,18 @@ const KEYBOARD_ROWS = [
 ];
 
 export const Keyboard = () => {
-  const { gameWon, usedLetters, submitGuess } = useGameContext();
-  const [currentGuess, setCurrentGuess] = useState("");
+  const { gameWon, currentGuess, animatingGuess, usedLetters, submitGuess, updateCurrentGuess } = useGameContext();
 
   const handleKeyPress = (key: string) => {
-    if (gameWon) return;
+    if (gameWon || animatingGuess !== null) return;
 
     if (key === "ENTER") {
       if (currentGuess.length !== 4) return;
       submitGuess(currentGuess);
-
-      setCurrentGuess("");
     } else if (key === "BACKSPACE") {
-      setCurrentGuess((prev) => prev.slice(0, -1));
+      updateCurrentGuess(currentGuess.slice(0, -1));
     } else if (key.length === 1 && currentGuess.length < 4) {
-      setCurrentGuess((prev) => prev + key);
+      updateCurrentGuess(currentGuess + key);
     }
   };
 
@@ -33,41 +29,23 @@ export const Keyboard = () => {
     return "key";
   };
   return (
-    <>
-      <div className="current-guess-container">
-        <div className="current-guess-display">
-          <div className="current-guess-row">
-            {Array.from({ length: 4 }).map((_, index) => (
-              <div
-                key={index}
-                className={`current-letter ${
-                  currentGuess[index] ? "filled" : ""
-                }`}
+    <div className="keyboard-container">
+      <div className="keyboard">
+        {KEYBOARD_ROWS.map((row, rowIndex) => (
+          <div key={rowIndex} className="keyboard-row">
+            {row.map((key) => (
+              <button
+                key={key}
+                className={getKeyClass(key)}
+                onClick={() => handleKeyPress(key)}
+                disabled={gameWon || animatingGuess !== null}
               >
-                {currentGuess[index] || ""}
-              </div>
+                {key === "BACKSPACE" ? "⌫" : key}
+              </button>
             ))}
           </div>
-        </div>
+        ))}
       </div>
-      <div className="keyboard-container">
-        <div className="keyboard">
-          {KEYBOARD_ROWS.map((row, rowIndex) => (
-            <div key={rowIndex} className="keyboard-row">
-              {row.map((key) => (
-                <button
-                  key={key}
-                  className={getKeyClass(key)}
-                  onClick={() => handleKeyPress(key)}
-                  disabled={gameWon}
-                >
-                  {key === "BACKSPACE" ? "⌫" : key}
-                </button>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
-    </>
+    </div>
   );
 };

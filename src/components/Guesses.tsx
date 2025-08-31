@@ -16,8 +16,47 @@ const getLetterClass = (state: LetterState) => {
   }
 };
 
+const getLetterClassWithAnimation = (
+  state: LetterState,
+  guessIndex: number,
+  letterIndex: number,
+  animatingGuess: number | null
+) => {
+  const isAnimating = animatingGuess === guessIndex;
+  
+  if (isAnimating) {
+    // During animation, use letter-current as base and add animation class
+    switch (state) {
+      case "correct":
+        return "letter-current letter-flipping-correct";
+      case "wrong-position":
+        return "letter-current letter-flipping-wrong-position";
+      case "not-in-word":
+        return "letter-current letter-flipping-not-in-word";
+      default:
+        return "letter-current";
+    }
+  } else {
+    // After animation or no animation, use final colors
+    return getLetterClass(state);
+  }
+};
+
+const getAnimationStyle = (
+  guessIndex: number,
+  letterIndex: number,
+  animatingGuess: number | null
+) => {
+  if (animatingGuess === guessIndex) {
+    return {
+      animationDelay: `${letterIndex * 150}ms`,
+    };
+  }
+  return {};
+};
+
 export const Guesses = () => {
-  const { guesses, gameWon } = useGameContext();
+  const { guesses, currentGuess, animatingGuess, gameWon } = useGameContext();
 
   return (
     <div className="game-content">
@@ -29,16 +68,29 @@ export const Guesses = () => {
               {guess.map((letter, letterIndex) => (
                 <div
                   key={letterIndex}
-                  className={`letter ${getLetterClass(letter.state)}`}
+                  className={`letter ${getLetterClassWithAnimation(letter.state, guessIndex, letterIndex, animatingGuess)}`}
+                  style={getAnimationStyle(guessIndex, letterIndex, animatingGuess)}
                 >
                   {letter.char}
                 </div>
               ))}
             </div>
           ))}
+          {!gameWon && animatingGuess === null && (
+            <div className="guess-row">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <div
+                  key={index}
+                  className={`letter ${currentGuess[index] ? "letter-current" : "letter-empty"}`}
+                >
+                  {currentGuess[index] || ""}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
-        {gameWon && (
+        {gameWon && animatingGuess === null && (
           <div className="game-over">
             <h2>Congratulations!</h2>
           </div>
