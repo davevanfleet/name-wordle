@@ -13,8 +13,10 @@ export interface Letter {
 
 type GameContextType = {
   gameWon: boolean;
+  gameLost: boolean;
   guesses: Letter[][];
   currentGuess: string;
+  currentRowIndex: number;
   animatingGuess: number | null;
   usedLetters: Record<string, LetterState>;
   submitGuess: (guess: string) => void;
@@ -23,8 +25,10 @@ type GameContextType = {
 
 export const GameContext = createContext<GameContextType>({
   gameWon: false,
+  gameLost: false,
   guesses: [],
   currentGuess: "",
+  currentRowIndex: 0,
   animatingGuess: null,
   usedLetters: {},
   submitGuess: () => {},

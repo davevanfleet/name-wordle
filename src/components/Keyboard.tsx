@@ -7,10 +7,10 @@ const KEYBOARD_ROWS = [
 ];
 
 export const Keyboard = () => {
-  const { gameWon, currentGuess, animatingGuess, usedLetters, submitGuess, updateCurrentGuess } = useGameContext();
+  const { gameWon, gameLost, currentGuess, animatingGuess, usedLetters, submitGuess, updateCurrentGuess } = useGameContext();
 
   const handleKeyPress = (key: string) => {
-    if (gameWon || animatingGuess !== null) return;
+    if (gameWon || gameLost || animatingGuess !== null) return;
 
     if (key === "ENTER") {
       if (currentGuess.length !== 4) return;
@@ -38,7 +38,7 @@ export const Keyboard = () => {
                 key={key}
                 className={getKeyClass(key)}
                 onClick={() => handleKeyPress(key)}
-                disabled={gameWon || animatingGuess !== null}
+                disabled={gameWon || gameLost || animatingGuess !== null}
               >
                 {key === "BACKSPACE" ? "⌫" : key}
               </button>

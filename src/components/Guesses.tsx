@@ -23,7 +23,7 @@ const getLetterClassWithAnimation = (
   animatingGuess: number | null
 ) => {
   const isAnimating = animatingGuess === guessIndex;
-  
+
   if (isAnimating) {
     // During animation, use letter-current as base and add animation class
     switch (state) {
@@ -55,44 +55,92 @@ const getAnimationStyle = (
   return {};
 };
 
+const MAX_GUESSES = 6;
+
 export const Guesses = () => {
-  const { guesses, currentGuess, animatingGuess, gameWon } = useGameContext();
+  const {
+    guesses,
+    currentGuess,
+    currentRowIndex,
+    animatingGuess,
+    gameWon,
+    gameLost,
+  } = useGameContext();
+
+  const renderRow = (rowIndex: number) => {
+    const guess = guesses[rowIndex];
+    const isCurrentRow = rowIndex === currentRowIndex;
+    const isCompletedRow = guess && guess.length > 0;
+
+    if (isCompletedRow) {
+      // Render completed guess
+      return (
+        <div key={rowIndex} className="guess-row">
+          {guess.map((letter, letterIndex) => (
+            <div
+              key={letterIndex}
+              className={`letter ${getLetterClassWithAnimation(
+                letter.state,
+                rowIndex,
+                letterIndex,
+                animatingGuess
+              )}`}
+              style={getAnimationStyle(rowIndex, letterIndex, animatingGuess)}
+            >
+              {letter.char}
+            </div>
+          ))}
+        </div>
+      );
+    } else if (
+      isCurrentRow &&
+      !gameWon &&
+      !gameLost &&
+      animatingGuess === null
+    ) {
+      return (
+        <div key={rowIndex} className="guess-row guess-row-current">
+          {Array.from({ length: 4 }).map((_, letterIndex) => (
+            <div
+              key={letterIndex}
+              className={`letter ${
+                currentGuess[letterIndex] ? "letter-current" : "letter-empty"
+              }`}
+            >
+              {currentGuess[letterIndex] || ""}
+            </div>
+          ))}
+        </div>
+      );
+    } else {
+      return (
+        <div key={rowIndex} className="guess-row">
+          {Array.from({ length: 4 }).map((_, letterIndex) => (
+            <div key={letterIndex} className="letter letter-empty">
+              {""}
+            </div>
+          ))}
+        </div>
+      );
+    }
+  };
 
   return (
     <div className="game-content">
-      {" "}
       <div className="scrollable-content">
         <div className="game-grid">
-          {guesses.map((guess, guessIndex) => (
-            <div key={guessIndex} className="guess-row">
-              {guess.map((letter, letterIndex) => (
-                <div
-                  key={letterIndex}
-                  className={`letter ${getLetterClassWithAnimation(letter.state, guessIndex, letterIndex, animatingGuess)}`}
-                  style={getAnimationStyle(guessIndex, letterIndex, animatingGuess)}
-                >
-                  {letter.char}
-                </div>
-              ))}
-            </div>
-          ))}
-          {!gameWon && animatingGuess === null && (
-            <div className="guess-row">
-              {Array.from({ length: 4 }).map((_, index) => (
-                <div
-                  key={index}
-                  className={`letter ${currentGuess[index] ? "letter-current" : "letter-empty"}`}
-                >
-                  {currentGuess[index] || ""}
-                </div>
-              ))}
-            </div>
+          {Array.from({ length: MAX_GUESSES }).map((_, rowIndex) =>
+            renderRow(rowIndex)
           )}
         </div>
 
-        {gameWon && animatingGuess === null && (
+        {(gameWon || gameLost) && animatingGuess === null && (
           <div className="game-over">
-            <h2>Congratulations!</h2>
+            <h2>
+              {gameWon
+                ? "Congratulations!"
+                : "Game over! Refresh to keep guessing"}
+            </h2>
           </div>
         )}
       </div>

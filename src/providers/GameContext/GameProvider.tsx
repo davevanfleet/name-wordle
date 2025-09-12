@@ -5,6 +5,7 @@ import { useToastContext } from "../ToastContext/ToastContext";
 
 const TARGET_WORD = "ENZO";
 const TARGET_LETTERS = TARGET_WORD.split("");
+const MAX_GUESSES = 6;
 
 export const GameContextProvider = ({
   children,
@@ -12,8 +13,10 @@ export const GameContextProvider = ({
   const { setShowToast } = useToastContext();
 
   const [gameWon, setGameWon] = useState(false);
+  const [gameLost, setGameLost] = useState(false);
   const [guesses, setGuesses] = useState<Letter[][]>([]);
   const [currentGuess, setCurrentGuess] = useState("");
+  const [currentRowIndex, setCurrentRowIndex] = useState(0);
   const [animatingGuess, setAnimatingGuess] = useState<number | null>(null);
   const [usedLetters, setUsedLetters] = useState<Record<string, LetterState>>(
     {}
@@ -55,6 +58,8 @@ export const GameContextProvider = ({
   };
 
   const submitGuess = (guess: string) => {
+    if (gameWon || gameLost || currentRowIndex >= MAX_GUESSES) return;
+    
     const upperGuess = guess.toUpperCase();
     if (!names.includes(upperGuess)) {
       setShowToast(true);
@@ -62,16 +67,21 @@ export const GameContextProvider = ({
     }
 
     const guessResult = checkGuess(upperGuess);
-    const guessIndex = guesses.length;
     const isWinningGuess = upperGuess === TARGET_WORD;
     
-    // Start animation
-    setAnimatingGuess(guessIndex);
-    setGuesses((prev) => [...prev, guessResult]);
-    setCurrentGuess("");
+    // Start animation for current row
+    setAnimatingGuess(currentRowIndex);
     
+    // Update guesses array at the current row index
+    setGuesses((prev) => {
+      const newGuesses = [...prev];
+      newGuesses[currentRowIndex] = guessResult;
+      return newGuesses;
+    });
+    
+    setCurrentGuess("");
 
-    // Update used letters and check for win after animation completes
+    // Update used letters and check for win/loss after animation completes
     setTimeout(() => {
       const newUsedLetters = { ...usedLetters };
       guessResult.forEach((letter) => {
@@ -88,6 +98,10 @@ export const GameContextProvider = ({
 
       if (isWinningGuess) {
         setGameWon(true);
+      } else if (currentRowIndex >= MAX_GUESSES - 1) {
+        setGameLost(true);
+      } else {
+        setCurrentRowIndex(currentRowIndex + 1);
       }
 
       setAnimatingGuess(null);
@@ -100,7 +114,7 @@ export const GameContextProvider = ({
 
   return (
     <GameContext.Provider
-      value={{ gameWon, guesses, currentGuess, animatingGuess, usedLetters, submitGuess, updateCurrentGuess }}
+      value={{ gameWon, gameLost, guesses, currentGuess, currentRowIndex, animatingGuess, usedLetters, submitGuess, updateCurrentGuess }}
     >
       {children}
     </GameContext.Provider>

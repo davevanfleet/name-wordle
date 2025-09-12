@@ -1,5 +1,5 @@
 export const Header = () => (
   <header className="game-header">
-    <h1>Name Wordle</h1>
+    <h1>Baby Wordle</h1>
   </header>
 );
