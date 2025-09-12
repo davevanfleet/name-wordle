@@ -19,7 +19,6 @@ const getLetterClass = (state: LetterState) => {
 const getLetterClassWithAnimation = (
   state: LetterState,
   guessIndex: number,
-  letterIndex: number,
   animatingGuess: number | null
 ) => {
   const isAnimating = animatingGuess === guessIndex;
@@ -82,7 +81,6 @@ export const Guesses = () => {
               className={`letter ${getLetterClassWithAnimation(
                 letter.state,
                 rowIndex,
-                letterIndex,
                 animatingGuess
               )}`}
               style={getAnimationStyle(rowIndex, letterIndex, animatingGuess)}
